@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BaseLab – Number and Code Converter</title>
+<style>
+:root{color-scheme:dark;--bg:#100e26;--panel:rgba(30,26,66,.72);--ink:#efeaff;--mute:#9d97c4;--line:rgba(160,150,255,.22);--amber:#ffc857;--cyan:#6be3ff;--off:rgba(255,255,255,.07);--bad:#ff8a8a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:radial-gradient(1200px 700px at 80% -10%,#2b2268 0%,transparent 60%),var(--bg);color:var(--ink);font:16px/1.55 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 20px 56px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;flex-wrap:wrap}
+.logo{font:700 1.4rem Palatino,"Palatino Linotype",Georgia,serif;color:var(--ink);text-decoration:none}
+.logo i{color:var(--amber);font-style:normal}
+.top nav{display:flex;gap:6px}
+.top nav a{color:var(--mute);text-decoration:none;padding:7px 14px;border-radius:999px;border:1px solid transparent}
+.top nav a[aria-current=page]{color:var(--bg);background:var(--amber);font-weight:700}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,.tile:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.page{display:none}.page.show{display:block}
+h1{font:700 clamp(2.4rem,7vw,4.6rem)/1 Palatino,"Palatino Linotype",Georgia,serif;margin:44px 0 14px;letter-spacing:-.02em}
+h2{font:700 1.15rem Palatino,Georgia,serif;margin:24px 0 8px}
+.lead{color:var(--mute);max-width:52ch;font-size:1.1rem;margin:0 0 30px}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.door{display:block;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;backdrop-filter:blur(6px);transition:transform .2s,border-color .2s}
+.door:hover{transform:translateY(-4px);border-color:var(--amber)}
+.door h3{font:700 1.6rem Palatino,Georgia,serif;margin:0 0 6px}
+.door p{color:var(--mute);margin:0 0 18px}
+.door code{font:700 1.25rem ui-monospace,Consolas,monospace;color:var(--cyan);word-break:break-all}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(6px);min-width:0}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.ctl>div{flex:1;min-width:160px}
+label{display:block;font-weight:600;color:var(--mute);margin-bottom:5px;font-size:.92rem}
+input,select{width:100%;font:600 1.35rem ui-monospace,Consolas,monospace;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.28);color:var(--ink)}
+select{font-size:1rem;font-family:inherit}
+.err{color:var(--bad);min-height:1.5em;margin:8px 0 0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.tile{background:var(--off);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;min-width:0}
+.tile[aria-pressed=true]{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset}
+.tile b{display:block;color:var(--mute);font-size:.85rem;font-weight:600}
+.tile span{display:block;font:700 1.3rem ui-monospace,Consolas,monospace;word-break:break-all;color:var(--cyan)}
+.tile button{margin-top:6px}
+.sm{font:inherit;font-size:.85rem;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:3px 10px;cursor:pointer}
+.sw{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sw button{width:46px;border:1px solid var(--line);background:var(--off);color:var(--mute);border-radius:10px;padding:6px 0 8px;cursor:pointer;font:inherit}
+.sw button small{display:block;font-size:.68rem;color:var(--mute)}
+.sw button strong{display:block;font:700 1.35rem ui-monospace,monospace}
+.sw button[aria-pressed=true]{background:var(--amber);color:#1b1500;border-color:var(--amber)}
+.sw button[aria-pressed=true] small{color:#4b3a00}
+.sw button.nib{margin-right:10px}
+.bits{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}
+.bit{width:32px;height:40px;border-radius:8px;display:grid;place-items:center;font:700 1.05rem ui-monospace,monospace;background:var(--off);color:var(--mute)}
+.bit.on{background:var(--cyan);color:#06222b}
+.gap{width:10px}
+.res{font:700 1.8rem ui-monospace,Consolas,monospace;word-break:break-all;color:var(--cyan)}
+.steps{overflow-x:auto;margin-top:6px}
+table{border-collapse:collapse;font:.95rem ui-monospace,Consolas,monospace;width:100%}
+td,th{padding:5px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mute);font-weight:600}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tabs button{font:inherit;padding:8px 14px;border:1px solid var(--line);background:var(--off);color:var(--ink);border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--amber);color:#1b1500;border-color:var(--amber);font-weight:700}
+.note{color:var(--mute);margin:6px 0 0}
+@media (max-width:700px){.doors{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="wrap">
+<header class="top">
+ <a class="logo" href="#home">Base<i>Lab</i></a>
+ <nav aria-label="Pages"><a href="#numbers" data-r="numbers">Number conversion</a><a href="#codes" data-r="codes">Code conversion</a></nav>
+</header>
+
+<section class="page" id="home">
+ <h1>Think in bits.</h1>
+ <p class="lead">Type a value and watch it change shape in every base, or flip the bits yourself. Pick a side to start.</p>
+ <div class="doors">
+  <a class="door" href="#numbers"><h3>Number conversion</h3><p>Decimal, binary, octal and hexadecimal, live, with a bit switchboard.</p><code>156 = 10011100 = 234 = 9C</code></a>
+  <a class="door" href="#codes"><h3>Code conversion</h3><p>Binary to Gray code and Gray code back to binary, with a bit-by-bit XOR table.</p><code>1011 → 1110</code></a>
+ </div>
+</section>
+
+<section class="page" id="numbers">
+ <h1 style="font-size:clamp(2rem,5vw,3rem);margin-top:18px">Number conversion</h1>
+ <div class="card">
+  <div class="ctl">
+   <div><label for="nin">Value</label><input id="nin" autocomplete="off" autocapitalize="off" spellcheck="false" value="156"></div>
+   <div style="max-width:220px"><label for="nbase">Entered in</label><select id="nbase"><option value="10">Decimal (base 10)</option><option value="2">Binary (base 2)</option><option value="8">Octal (base 8)</option><option value="16">Hexadecimal (base 16)</option></select></div>
+  </div>
+  <p class="err" id="nerr" role="alert"></p>
+  <div class="tiles" id="tiles"></div>
+  <h2>Bit switchboard</h2>
+  <p class="note" id="swnote">Tap a bit to flip it. The value above updates instantly.</p>
+  <div class="sw" id="sw"></div>
+ </div>
+</section>
+
+<section class="page" id="codes">
+ <h1 style="font-size:clamp(2rem,5vw,3rem);margin-top:18px">Code conversion</h1>
+ <div class="tabs" id="ctabs" role="group" aria-label="Code converters"></div>
+ <div class="card">
+  <label for="cin" id="clabel"></label>
+  <input id="cin" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <p class="err" id="cerr" role="alert"></p>
+  <div id="cout"></div>
+ </div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const D='0123456789ABCDEF';
+
+/* ---------- routing ---------- */
+function route(){
+ let r=location.hash.slice(1);if(!['numbers','codes'].includes(r))r='home';
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('show',p.id===r));
+ document.querySelectorAll('[data-r]').forEach(a=>a.toggleAttribute('aria-current',a.dataset.r===r)||(a.removeAttribute('aria-current')));
+ document.querySelectorAll('[data-r]').forEach(a=>{if(a.dataset.r===r)a.setAttribute('aria-current','page')});
+ window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+
+/* ---------- number conversion ---------- */
+const RE={2:/^[01]+$/,8:/^[0-7]+$/,10:/^[0-9]+$/,16:/^[0-9a-f]+$/i};
+const NM={10:'Decimal',2:'Binary',8:'Octal',16:'Hexadecimal'};
+const MSG={2:'Binary uses only 0 and 1.',8:'Octal uses digits 0 to 7.',10:'Decimal uses digits 0 to 9. Whole numbers only.',16:'Hexadecimal uses 0 to 9 and A to F.'};
+let nval=0n;
+const pfx={2:'0b',8:'0o',16:'0x',10:''};
+const fmt=(n,b)=>n.toString(b).toUpperCase();
+function nCalc(){
+ const raw=$('nin').value.trim().replace(/\s+/g,''),b=+$('nbase').value,err=$('nerr');
+ err.textContent='';
+ if(!raw){err.textContent='Type a value to convert.';clearN();return}
+ if(!RE[b].test(raw)){err.textContent=MSG[b];clearN();return}
+ nval=BigInt(pfx[b]+raw);
+ $('tiles').innerHTML=[10,2,8,16].map(x=>`<div class="tile"><b>${NM[x]}</b><span>${fmt(nval,x)}</span><button class="sm" data-copy="${x}">Copy</button></div>`).join('');
+ renderSw();
+}
+function clearN(){$('tiles').innerHTML='';$('sw').innerHTML=''}
+function renderSw(){
+ const n=nval,w=n<256n?8:n<65536n?16:n<4294967296n?32:0;
+ if(!w){$('sw').innerHTML='';$('swnote').textContent='This number is wider than 32 bits, so the switchboard is hidden.';return}
+ $('swnote').textContent='Tap a bit to flip it. The value above updates instantly.';
+ const s=n.toString(2).padStart(w,'0');
+ $('sw').innerHTML=[...s].map((c,i)=>{const p=w-1-i;return `<button data-bit="${p}" aria-pressed="${c==='1'}" aria-label="Bit ${p}, value ${2n**BigInt(p)}, ${c==='1'?'on':'off'}"${p%4===0&&p?' class="nib"':''}><small>${p<20?2n**BigInt(p):'2^'+p}</small><strong>${c}</strong></button>`}).join('');
+}
+$('nin').addEventListener('input',nCalc);
+$('nbase').addEventListener('change',()=>{ $('nin').value=fmt(nval,+$('nbase').value);nCalc()});
+$('tiles').addEventListener('click',e=>{
+ const c=e.target.closest('[data-copy]');
+ if(c){const t=fmt(nval,+c.dataset.copy);const ok=()=>c.textContent='Copied';
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>{});else{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(_){}a.remove()}
+  e.stopPropagation();return}
+});
+$('sw').addEventListener('click',e=>{
+ const b=e.target.closest('[data-bit]');if(!b)return;
+ nval^=1n<<BigInt(b.dataset.bit);
+ $('nin').value=fmt(nval,+$('nbase').value);nCalc();
+});
+
+/* ---------- code conversion ---------- */
+const bitsHTML=(s)=>'<div class="bits">'+[...s].map(c=>c===' '?'<span class="gap"></span>':`<span class="bit${c==='1'?' on':''}">${c}</span>`).join('')+'</div>';
+const gray=s=>{let o=s[0];for(let i=1;i<s.length;i++)o+=s[i]^s[i-1];return o};
+const unGray=s=>{let o=s[0];for(let i=1;i<s.length;i++)o+=o[i-1]^s[i];return o};
+const tbl=(h,rows)=>`<div class="steps"><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(r=>'<tr>'+r.map(x=>`<td>${esc(x)}</td>`).join('')+'</tr>').join('')}</table></div>`;
+const CODES=[
+{id:'b2g',t:'Binary to Gray',l:'Binary number',p:'1011',f:v=>{
+ if(!/^[01]+$/.test(v))return{e:'Binary uses only 0 and 1.'};
+ const g=gray(v);return{res:g,bits:g,h:tbl(['Bit','Binary','Rule','Gray'],[...v].map((c,i)=>[i+1,c,i?v[i-1]+' XOR '+c:'copy first bit',g[i]]))+'<p class="note">Keep the first bit. Every other Gray bit is the XOR of two neighbouring binary bits.</p>'}}},
+{id:'g2b',t:'Gray to Binary',l:'Gray code',p:'1110',f:v=>{
+ if(!/^[01]+$/.test(v))return{e:'Gray code uses only 0 and 1.'};
+ const b=unGray(v);return{res:b,bits:b,h:tbl(['Bit','Gray','Rule','Binary'],[...v].map((c,i)=>[i+1,c,i?b[i-1]+' XOR '+c:'copy first bit',b[i]]))+'<p class="note">Keep the first bit. Each binary bit is the previous binary bit XOR the current Gray bit.</p>'}}},
+{id:'t2a',t:'Text to ASCII',l:'Text',p:'Hello',f:v=>{
+ const by=[...new TextEncoder().encode(v)];
+ const g=by.map(n=>n.toString(2).padStart(8,'0')),ch=[...v];
+ return{res:g.join(' '),h:by.length<=40?tbl(['Character','Decimal','Hex','Binary'],by.map((n,i)=>[by.length===ch.length?ch[i]:'byte '+(i+1),n,n.toString(16).toUpperCase().padStart(2,'0'),g[i]]))+'<p class="note">Each character becomes its code number, written as 8 bits.</p>':''}}},
+{id:'a2t',t:'ASCII to Text',l:'Binary bytes (8 bits each)',p:'01001000 01101001',f:v=>{
+ const s=v.replace(/\s+/g,'');
+ if(!/^[01]+$/.test(s))return{e:'Use only 0 and 1.'};
+ if(s.length%8)return{e:'Length must be a multiple of 8 bits.'};
+ const by=[];for(let i=0;i<s.length;i+=8)by.push(parseInt(s.slice(i,i+8),2));
+ const txt=new TextDecoder().decode(new Uint8Array(by));
+ return{res:txt,h:by.length<=40?tbl(['Binary','Decimal'],by.map((n,i)=>[s.slice(i*8,i*8+8),n]))+'<p class="note">Each group of 8 bits is a code number, which maps to one character.</p>':''}}}
+];
+let cc=CODES[0];
+const tabs=$('ctabs');
+CODES.forEach(c=>{const b=document.createElement('button');b.textContent=c.t;b.setAttribute('aria-pressed',c===cc);b.onclick=()=>{cc=c;[...tabs.children].forEach(x=>x.setAttribute('aria-pressed',x===b));$('cin').value=c.p;cRun()};tabs.appendChild(b)});
+function cRun(){
+ $('clabel').textContent=cc.l;$('cin').placeholder=cc.p;
+ const v=$('cin').value.trim();$('cerr').textContent='';$('cout').innerHTML='';
+ if(!v){return}
+ const r=cc.f(v);
+ if(r.e){$('cerr').textContent=r.e;return}
+ $('cout').innerHTML=`<h2>Result</h2><div class="res">${esc(r.res)}</div>`+(r.bits?bitsHTML(r.bits):'')+(r.h?`<h2>How it works</h2>${r.h}`:'');
+}
+$('cin').addEventListener('input',cRun);
+
+/* ---------- binary rain background ---------- */
+(function(){
+ const cv=$('rain'),x=cv.getContext('2d');let W,H,cols,drops;
+ const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function size(){W=cv.width=innerWidth;H=cv.height=innerHeight;cols=Math.ceil(W/22);drops=Array.from({length:cols},()=>Math.random()*H/22)}
+ function draw(){
+  x.fillStyle='rgba(16,14,38,.12)';x.fillRect(0,0,W,H);
+  x.font='16px ui-monospace,monospace';
+  for(let i=0;i<cols;i++){
+   x.fillStyle=Math.random()<.04?'rgba(255,200,87,.5)':'rgba(107,227,255,.18)';
+   x.fillText(Math.random()<.5?'0':'1',i*22,drops[i]*22);
+   if(drops[i]*22>H&&Math.random()>.975)drops[i]=0;
+   drops[i]+=.35;
+  }
+ }
+ size();addEventListener('resize',size);
+ if(still){for(let i=0;i<60;i++)draw()}else setInterval(draw,60);
+})();
+
+$('cin').value=cc.p;cRun();nCalc();route();
+</script>
+</body>
+</html>
